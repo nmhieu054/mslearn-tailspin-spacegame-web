@@ -19,11 +19,6 @@ steps:
     packageType: sdk
     version: '6.x'
 
-- task: npm@1
-  inputs:
-    command: 'install'
-    arguments: 'gulp'
-
 - task: NodeTool@0
   displayName: 'Use Node.js $(version)'
   inputs:
@@ -33,6 +28,13 @@ steps:
     echo "##vso[task.setvariable variable=PATH;]$(System.DefaultWorkingDirectory)/node_modules/.bin:$PATH"
   displayName: 'Set PATH environment variable'
 
+- task: Npm@1
+  displayName: 'Install gulp'
+  inputs:
+    command: install
+    workingDir: $(System.DefaultWorkingDirectory)
+    packagesToInstall: gulp
+    
 - task: gulp@1
   displayName: 'Run gulp tasks'
 
