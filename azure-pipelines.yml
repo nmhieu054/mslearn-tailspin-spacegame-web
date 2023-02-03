@@ -19,6 +19,26 @@ steps:
     packageType: sdk
     version: '6.x'
 
+- task: npm@1
+  inputs:
+    command: 'install'
+    arguments: 'gulp'
+
+- task: NodeTool@0
+  displayName: 'Use Node.js $(version)'
+  inputs:
+    versionSpec: 14.x
+
+- script: |
+    echo "##vso[task.setvariable variable=PATH;]$(System.DefaultWorkingDirectory)/node_modules/.bin:$PATH"
+  displayName: 'Set PATH environment variable'
+
+- task: gulp@1
+  displayName: 'Run gulp tasks'
+
+- script: 'echo "$(Build.DefinitionName), $(Build.BuildId), $(Build.BuildNumber)" > buildinfo.txt'
+  displayName: 'Write build info'
+  workingDirectory: Tailspin.SpaceGame.Web/wwwroot
 
 - task: DotNetCoreCLI@2
   displayName: 'Restore project dependencies'
