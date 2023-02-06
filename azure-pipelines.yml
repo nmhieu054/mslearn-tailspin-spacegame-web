@@ -34,8 +34,6 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-- task: PowerShell@2
+- task: CmdLine@2
   inputs:
-    targetType: 'inline'
-    script: |
-      docker system prune -f --verbose
+    script: 'docker system prune -a --force' 
