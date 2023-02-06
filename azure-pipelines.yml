@@ -34,9 +34,8 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-- task: AzureCLI@2
+- task: CmdLine@2
   inputs:
-    scriptType: 'ps'
-    scriptLocation: 'inlineScript'
-    inlineScript: |
+    script: |
       docker system prune -f
+
