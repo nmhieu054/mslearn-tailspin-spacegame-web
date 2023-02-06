@@ -9,42 +9,34 @@ trigger:
 pool:
   name: 'Default' 
   vmImage: 'windows-latest'
+
 variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
 steps:
-- task: UseDotNet@2
-  displayName: 'Use .NET SDK 6.x'
-  inputs:
-    packageType: sdk
-    version: '6.x'
+- task: NuGetToolInstaller@1
 
-- task: NodeTool@0
-  displayName: 'Use Node.js $(version)'
+- task: NuGetCommand@2
   inputs:
-    versionSpec: 14.x
+    restoreSolution: '$(solution)'
 
-- task: Npm@1
-  displayName: 'Install gulp'
+- task: VSBuild@1
   inputs:
-    command: install
-    workingDir: $(System.DefaultWorkingDirectory)
-    packagesToInstall: gulp
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
 
-- script: |
-    echo "##vso[task.setvariable variable=PATH;]$(System.DefaultWorkingDirectory)/node_modules/.bin:$PATH"
-  displayName: 'Set PATH environment variable'
-    
-
-- task: DotNetCoreCLI@2
-  displayName: 'Restore project dependencies'
+- task: VSTest@2
   inputs:
-    command: 'restore'
-    projects: '**/*.csproj'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Build the project - Release'
+- task: AzureCLI@2
   inputs:
-    command: 'build'
-    arguments: '--no-restore --configuration Release'
-    projects: '**/*.csproj'
+    scriptType: 'ps'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      docker system prune -f
