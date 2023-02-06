@@ -38,6 +38,4 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      docker system prune -f
-
-
+      docker system prune -f --verbose
