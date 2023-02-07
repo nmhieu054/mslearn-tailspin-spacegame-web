@@ -36,4 +36,4 @@ steps:
 - task: CmdLine@2
   inputs:
     script: |
-      docker system prune -f
+      docker images
